@@ -78,9 +78,14 @@ def main() -> None:
 
         keys = integration.json()["integrations"][0]["api_keys"]
         content_key = next(k["secret"] for k in keys if k["type"] == "content")
-        admin_key = next(
-            f"{k['id']}:{k['secret']}" for k in keys if k["type"] == "admin"
-        )
+        
+	raw_admin = next(k for k in keys if k["type"] == "admin"
+
+	admin_key = (
+	    raw_admin["secret"]
+	    if ":" in raw_admin["secret"]
+	    else f"{raw_admin['id']}:{raw_admin['secret']}"
+	)
 
     print(f"GHOST_BASE_URL={BASE_URL}")
     print(f"GHOST_CONTENT_API_KEY={content_key}")
