@@ -1,0 +1,20 @@
+services:
+  ghost:
+    image: ghost:5-alpine
+    container_name: ghost-qa
+    ports:
+      - "2368:2368"
+    environment:
+      # Development mode = SQLite, no external DB needed. Perfect for a test target.
+      NODE_ENV: development
+      url: http://localhost:2368
+    volumes:
+      - ghost-content:/var/lib/ghost/content
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:2368/ghost/api/admin/site/"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  ghost-content:

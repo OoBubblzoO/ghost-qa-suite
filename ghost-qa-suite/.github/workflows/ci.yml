@@ -1,0 +1,61 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Ghost
+        run: docker compose up -d --wait
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Provision Ghost owner + API keys
+        # Automates the one-time setup wizard + custom integration creation,
+        # exporting GHOST_CONTENT_API_KEY / GHOST_ADMIN_API_KEY to the env.
+        run: python scripts/provision_ghost.py >> "$GITHUB_ENV"
+        env:
+          GHOST_BASE_URL: http://localhost:2368
+
+      - name: Smoke tests (fail fast)
+        run: pytest -m smoke --junitxml=reports/smoke.xml
+        env:
+          GHOST_BASE_URL: http://localhost:2368
+
+      - name: Full API suite
+        run: pytest -m "not e2e" --junitxml=reports/api.xml
+        env:
+          GHOST_BASE_URL: http://localhost:2368
+
+      - name: Install Playwright browsers
+        run: playwright install --with-deps chromium
+
+      - name: E2E critical path
+        run: pytest -m e2e --junitxml=reports/e2e.xml
+        env:
+          GHOST_BASE_URL: http://localhost:2368
+
+      - name: Publish test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: pytest results
+          path: reports/*.xml
+          reporter: java-junit
+
+      - name: Ghost logs on failure
+        if: failure()
+        run: docker compose logs ghost
