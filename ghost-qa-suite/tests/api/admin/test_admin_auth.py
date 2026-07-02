@@ -4,6 +4,8 @@ Auth is the highest-risk surface: a regression here is either a lockout
 (availability) or a bypass (security). Both directions are covered.
 """
 
+from __future__ import annotations
+
 import time
 
 import httpx
