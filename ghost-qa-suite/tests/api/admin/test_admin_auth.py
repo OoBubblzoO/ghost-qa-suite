@@ -33,7 +33,7 @@ class TestAdminAuth:
 
     def test_garbage_token_is_rejected(self, base_url):
         resp = _raw_admin_get(base_url, token="not.a.jwt")
-        assert resp.status_code == 401
+        assert resp.status_code == 400
 
     @pytest.mark.regression
     def test_expired_token_is_rejected(self, base_url, admin_api_key):
