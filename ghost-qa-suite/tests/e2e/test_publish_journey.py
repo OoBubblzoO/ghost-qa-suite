@@ -11,6 +11,7 @@ Requires GHOST_ADMIN_EMAIL / GHOST_ADMIN_PASSWORD in the environment
 
 import os
 import uuid
+import re
 
 import pytest
 from playwright.sync_api import Page, expect
@@ -34,7 +35,7 @@ def _login(page: Page, email: str, password: str) -> None:
     page.get_by_label("Email address").fill(email)
     page.get_by_label("Password").fill(password)
     page.get_by_role("button", name="Sign in").click()
-    expect(page).to_have_url(lambda url: "/signin" not in url, timeout=15_000)
+    expect(page).not_to_have_url(re.compile(r".*signin*"), timeout=15_000)
 
 
 def test_login_create_publish_and_verify_public_render(page: Page, admin_credentials):
@@ -68,4 +69,4 @@ def test_login_with_wrong_password_shows_error(page: Page, admin_credentials):
     page.get_by_label("Password").fill("definitely-not-the-password")
     page.get_by_role("button", name="Sign in").click()
     # Must fail visibly and stay on the signin screen.
-    expect(page).to_have_url(lambda url: "/signin" in url)
+    expect(page).to_have_url(re.compile(r".*signin.*"))
