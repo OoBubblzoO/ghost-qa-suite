@@ -8,6 +8,7 @@ services:
       # Development mode = SQLite, no external DB needed. Perfect for a test target.
       NODE_ENV: development
       url: http://localhost:2368
+      security__staffDeviceVerification: "false"
     volumes:
       - ghost-content:/var/lib/ghost/content
     healthcheck:
