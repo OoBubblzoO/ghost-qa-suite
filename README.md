@@ -1,3 +1,5 @@
+![Test Suite](https://github.com/OoBubblzoO/ghost-qa-suite/actions/workflows/ci.yml/badge.svg)
+
 # Ghost CMS — Automated Test Suite
 
 Automated API and E2E test suite for [Ghost](https://ghost.org), the open-source publishing platform, built with **pytest**, **httpx**, and **Playwright**, running in **GitHub Actions** against a Dockerized Ghost instance.
